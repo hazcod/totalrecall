@@ -8,11 +8,14 @@ This will extract any Recall extracts which contains the following information:
 - Window title
 - Window token
 - Screenshot contents
+- Web traffic information (domain, URL)
 
 This does not need SYSTEM privileges on Windows, as it's just reading data in %APPDATA%.
 Current user privileges are sufficient, however the SDK supports other user accounts if you are indeed SYSTEM.
 
 ## Usage
+
+First make sure you have a Windows CoPilot+ device on ARM64 or enable it using [Amperage](https://github.com/thebookisclosed/AmperageKit).
 
 Either use the CLI utility:
 
@@ -34,6 +37,7 @@ func main() {
 	recall, err := recallPkg.New(nil) // or set a Logrus.Logger
 	if err != nil { log.Fatal(err) }
 
+	// find any OCRd images
 	extracts, err := recallPkg.ExtractImagesForCurrentUser()
 	if err != nil {
 		log.Printf("could not extract Recall Images: %w", err)
