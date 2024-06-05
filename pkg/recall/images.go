@@ -49,79 +49,8 @@ func fileExists(path string) bool {
 	return !os.IsNotExist(err)
 }
 
-func (r *Recall) ExtractImagesForCurrentUser() ([]ExtractResult, error) {
-	r.logger.Debug("retrieving current user")
-	username, err := getUserName()
-	if err != nil {
-		return nil, err
-	}
-
-	return r.ExtractImages(username)
-}
-
-func (r *Recall) GetRecallPathsForCurrentUser() (string, string, error) {
-	r.logger.Debug("retrieving current user")
-	username, err := getUserName()
-	if err != nil {
-		return "", "", err
-	}
-
-	return r.GetRecallPaths(username)
-}
-
-func (r *Recall) GetRecallPaths(username string) (string, string, error) {
-	escapedUsername := filepath.Clean(username)
-	basePath := fmt.Sprintf("C:\\Users\\%s\\AppData\\Local\\CoreAIPlatform.00\\UKP", escapedUsername)
-
-	r.logger.WithField("basepath", basePath).Debug("finding Recall GUID folder")
-	guidFolder, err := findGuidFolder(basePath)
-	if err != nil {
-		// RecallNotEnabledErr
-		return "", "", err
-	}
-
-	r.logger.Infof("📁 Recall folder found: %s\n", guidFolder)
-
-	dbPath := filepath.Join(guidFolder, "ukg.db")
-	imageStorePath := filepath.Join(guidFolder, "ImageStore")
-
-	r.logger.Debugf("checking image store path: %s\n", imageStorePath)
-
-	if !fileExists(dbPath) || !fileExists(imageStorePath) {
-		return "", "", NotEnabledError
-	}
-
-	return dbPath, imageStorePath, nil
-}
-
-func (r *Recall) IsRecallEnabled(username string) (bool, error) {
-	if username == "" {
-		r.logger.Debug("retrieving current user")
-		var err error
-		username, err = getUserName()
-		if err != nil {
-			return false, err
-		}
-	}
-
-	_, _, err := r.GetRecallPaths(username)
-	return errors.Is(err, NotEnabledError), nil
-}
-
-func (r *Recall) ExtractImages(userName string) ([]ExtractResult, error) {
-	if userName == "" {
-		return nil, fmt.Errorf("no username provided, provide one or use ExtractImagesForCurrentUser")
-	}
-
-	dbPath, imagePath, err := r.GetRecallPaths(userName)
-	if err != nil {
-		return nil, err
-	}
-
-	r.logger.WithField("db_path", dbPath).WithField("image_path", imagePath).
-		Debug("Recall feature found enabled")
-
-	conn, err := sql.Open("sqlite3", dbPath)
+func (r *Recall) ExtractImages() ([]ExtractResult, error) {
+	conn, err := sql.Open("sqlite3", r.dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database connection: %w", err)
 	}

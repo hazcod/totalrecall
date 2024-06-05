@@ -18,6 +18,7 @@ func main() {
 	logger.SetLevel(defaultLogLevel)
 
 	logLevel := flag.String("log", defaultLogLevel.String(), "The log level to use.")
+	username := flag.String("username", "", "The username to find Recall with.")
 	flag.Parse()
 
 	logrusLevel, err := logrus.ParseLevel(*logLevel)
@@ -29,12 +30,12 @@ func main() {
 
 	// ---
 
-	recallPkg, err := recall.New(logger)
+	recallPkg, err := recall.New(logger, *username) // current user
 	if err != nil {
 		logger.WithError(err).Fatal("could not create init recall")
 	}
 
-	extracts, err := recallPkg.ExtractImagesForCurrentUser()
+	extracts, err := recallPkg.ExtractImages()
 	if errors.Is(err, recall.NotEnabledError) {
 		logger.Info("Recall is not enabled on this machine")
 		os.Exit(2)

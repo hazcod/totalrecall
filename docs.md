@@ -9,15 +9,12 @@ import "github.com/hazcod/totalrecall/pkg/recall"
 ## Index
 
 - [Variables](<#variables>)
+- [func IsRecallEnabled\(l \*logrus.Logger, username string\) \(bool, error\)](<#IsRecallEnabled>)
 - [type ExtractResult](<#ExtractResult>)
 - [type Recall](<#Recall>)
-  - [func New\(logger \*logrus.Logger\) \(\*Recall, error\)](<#New>)
-  - [func \(r \*Recall\) ExtractImages\(userName string\) \(\[\]ExtractResult, error\)](<#Recall.ExtractImages>)
-  - [func \(r \*Recall\) ExtractImagesForCurrentUser\(\) \(\[\]ExtractResult, error\)](<#Recall.ExtractImagesForCurrentUser>)
-  - [func \(r \*Recall\) ExtractWeb\(userName string\) \(\[\]WebResult, error\)](<#Recall.ExtractWeb>)
-  - [func \(r \*Recall\) GetRecallPaths\(username string\) \(string, string, error\)](<#Recall.GetRecallPaths>)
-  - [func \(r \*Recall\) GetRecallPathsForCurrentUser\(\) \(string, string, error\)](<#Recall.GetRecallPathsForCurrentUser>)
-  - [func \(r \*Recall\) IsRecallEnabled\(username string\) \(bool, error\)](<#Recall.IsRecallEnabled>)
+  - [func New\(logger \*logrus.Logger, userName string\) \(\*Recall, error\)](<#New>)
+  - [func \(r \*Recall\) ExtractImages\(\) \(\[\]ExtractResult, error\)](<#Recall.ExtractImages>)
+  - [func \(r \*Recall\) ExtractWeb\(\) \(\[\]WebResult, error\)](<#Recall.ExtractWeb>)
 - [type WebResult](<#WebResult>)
 
 
@@ -30,6 +27,15 @@ var (
     NotEnabledError = errors.New("recall not enabled")
 )
 ```
+
+<a name="IsRecallEnabled"></a>
+## func IsRecallEnabled
+
+```go
+func IsRecallEnabled(l *logrus.Logger, username string) (bool, error)
+```
+
+
 
 <a name="ExtractResult"></a>
 ## type ExtractResult
@@ -59,7 +65,7 @@ type Recall struct {
 ### func New
 
 ```go
-func New(logger *logrus.Logger) (*Recall, error)
+func New(logger *logrus.Logger, userName string) (*Recall, error)
 ```
 
 
@@ -68,16 +74,7 @@ func New(logger *logrus.Logger) (*Recall, error)
 ### func \(\*Recall\) ExtractImages
 
 ```go
-func (r *Recall) ExtractImages(userName string) ([]ExtractResult, error)
-```
-
-
-
-<a name="Recall.ExtractImagesForCurrentUser"></a>
-### func \(\*Recall\) ExtractImagesForCurrentUser
-
-```go
-func (r *Recall) ExtractImagesForCurrentUser() ([]ExtractResult, error)
+func (r *Recall) ExtractImages() ([]ExtractResult, error)
 ```
 
 
@@ -86,34 +83,7 @@ func (r *Recall) ExtractImagesForCurrentUser() ([]ExtractResult, error)
 ### func \(\*Recall\) ExtractWeb
 
 ```go
-func (r *Recall) ExtractWeb(userName string) ([]WebResult, error)
-```
-
-
-
-<a name="Recall.GetRecallPaths"></a>
-### func \(\*Recall\) GetRecallPaths
-
-```go
-func (r *Recall) GetRecallPaths(username string) (string, string, error)
-```
-
-
-
-<a name="Recall.GetRecallPathsForCurrentUser"></a>
-### func \(\*Recall\) GetRecallPathsForCurrentUser
-
-```go
-func (r *Recall) GetRecallPathsForCurrentUser() (string, string, error)
-```
-
-
-
-<a name="Recall.IsRecallEnabled"></a>
-### func \(\*Recall\) IsRecallEnabled
-
-```go
-func (r *Recall) IsRecallEnabled(username string) (bool, error)
+func (r *Recall) ExtractWeb() ([]WebResult, error)
 ```
 
 

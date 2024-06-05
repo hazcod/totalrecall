@@ -10,20 +10,8 @@ type WebResult struct {
 	URL    string
 }
 
-func (r *Recall) ExtractWeb(userName string) ([]WebResult, error) {
-	if userName == "" {
-		return nil, fmt.Errorf("no username provided, provide one or use ExtractImagesForCurrentUser")
-	}
-
-	dbPath, imagePath, err := r.GetRecallPaths(userName)
-	if err != nil {
-		return nil, err
-	}
-
-	r.logger.WithField("db_path", dbPath).WithField("image_path", imagePath).
-		Debug("Recall feature found enabled")
-
-	conn, err := sql.Open("sqlite3", dbPath)
+func (r *Recall) ExtractWeb() ([]WebResult, error) {
+	conn, err := sql.Open("sqlite3", r.dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database connection: %w", err)
 	}
