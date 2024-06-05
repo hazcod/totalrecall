@@ -2,6 +2,7 @@ all: run
 
 prepare:
 	go install github.com/goreleaser/goreleaser/v2@latest
+	go install github.com/princjef/gomarkdoc/cmd/gomarkdoc@latest
 
 run:
 	go run ./cmd/...
@@ -11,3 +12,6 @@ build:
 
 clean:
 	rm -r dist/ totalrecall || true
+
+gendocs:
+	gomarkdoc --output docs.md --exclude-dirs ./cmd/ ./...
