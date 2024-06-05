@@ -29,15 +29,6 @@ func getUserName() (string, error) {
 	return usr.Username, nil
 }
 
-func getCurrentDir() (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("error getting current directory: %w", err)
-	}
-
-	return dir, nil
-}
-
 func findGuidFolder(basePath string) (string, error) {
 	files, err := os.ReadDir(basePath)
 	if err != nil {
@@ -79,7 +70,8 @@ func (r *Recall) GetRecallPathsForCurrentUser() (string, string, error) {
 }
 
 func (r *Recall) GetRecallPaths(username string) (string, string, error) {
-	basePath := fmt.Sprintf("C:\\Users\\%s\\AppData\\Local\\CoreAIPlatform.00\\UKP", username)
+	escapedUsername := filepath.Clean(username)
+	basePath := fmt.Sprintf("C:\\Users\\%s\\AppData\\Local\\CoreAIPlatform.00\\UKP", escapedUsername)
 
 	r.logger.WithField("basepath", basePath).Debug("finding Recall GUID folder")
 	guidFolder, err := findGuidFolder(basePath)
