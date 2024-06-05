@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
-	"github.com/hazcod/totalrecall-go/pkg/recall"
+	"github.com/hazcod/totalrecall/pkg/recall"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 	"os"

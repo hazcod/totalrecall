@@ -30,7 +30,7 @@ package main
 import (
 	"log"
 	"os"
-	recallPkg "github.com/hazcod/totalrecall-go"
+	recallPkg "github.com/hazcod/totalrecall/pkg/recall"
 )
 
 func main() {
@@ -52,4 +52,4 @@ func main() {
 
 ## Documentation
 
-See the SDK documentation on [pkg.go.dev](https://pkg.go.dev/github.com/hazcod/totallrecall-gopkg/recall).
+See the SDK documentation on [pkg.go.dev](https://pkg.go.dev/github.com/hazcod/totalrecall).
