@@ -3,10 +3,10 @@ package main
 import (
 	"errors"
 	"flag"
+	"github.com/hazcod/totalrecall-go/pkg/recall"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 	"os"
-	"totalrecall-go/pkg/recall"
 )
 
 var (

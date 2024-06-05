@@ -1,4 +1,4 @@
-module totalrecall-go
+module github.com/hazcod/totalrecall-go
 
 go 1.22
 
