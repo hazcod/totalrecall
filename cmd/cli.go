@@ -30,6 +30,14 @@ func main() {
 
 	// ---
 
+	hasRecall, err := recall.IsRecallEnabled(nil, *username)
+	if err != nil {
+		logger.WithError(err).Error("could not determine if Recall is enabled")
+	}
+	if !hasRecall {
+		logger.Fatalf("%s does not have recall enabled.", *username)
+	}
+
 	recallPkg, err := recall.New(logger, *username) // current user
 	if err != nil {
 		logger.WithError(err).Fatal("could not create init recall")
