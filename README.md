@@ -9,6 +9,9 @@ This will extract any Recall extracts which contains the following information:
 - Window token
 - Screenshot contents
 
+This does not need SYSTEM privileges on Windows, as it's just reading data in %APPDATA%.
+Current user privileges are sufficient, however the SDK supports other user accounts if you are indeed SYSTEM.
+
 ## Usage
 
 Either use the CLI utility:
