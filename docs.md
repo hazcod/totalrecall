@@ -95,8 +95,9 @@ func (r *Recall) ExtractWeb() ([]WebResult, error)
 
 ```go
 type WebResult struct {
-    Domain string
-    URL    string
+    Timestamp int64
+    Domain    string
+    URL       string
 }
 ```
 
