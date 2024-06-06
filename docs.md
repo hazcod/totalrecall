@@ -15,6 +15,8 @@ import "github.com/hazcod/totalrecall/pkg/recall"
   - [func New\(logger \*logrus.Logger, userName string\) \(\*Recall, error\)](<#New>)
   - [func \(r \*Recall\) ExtractImages\(\) \(\[\]ExtractResult, error\)](<#Recall.ExtractImages>)
   - [func \(r \*Recall\) ExtractWeb\(\) \(\[\]WebResult, error\)](<#Recall.ExtractWeb>)
+  - [func \(r \*Recall\) GrabText\(\) \(\[\]TextGrab, error\)](<#Recall.GrabText>)
+- [type TextGrab](<#TextGrab>)
 - [type WebResult](<#WebResult>)
 
 
@@ -87,6 +89,27 @@ func (r *Recall) ExtractWeb() ([]WebResult, error)
 ```
 
 
+
+<a name="Recall.GrabText"></a>
+### func \(\*Recall\) GrabText
+
+```go
+func (r *Recall) GrabText() ([]TextGrab, error)
+```
+
+
+
+<a name="TextGrab"></a>
+## type TextGrab
+
+
+
+```go
+type TextGrab struct {
+    ProgramName string
+    Contents    string
+}
+```
 
 <a name="WebResult"></a>
 ## type WebResult
