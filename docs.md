@@ -9,10 +9,13 @@ import "github.com/hazcod/totalrecall/pkg/recall"
 ## Index
 
 - [Variables](<#variables>)
+- [func GetUserName\(\) \(string, error\)](<#GetUserName>)
 - [func IsRecallEnabled\(l \*logrus.Logger, username string\) \(bool, error\)](<#IsRecallEnabled>)
+- [type AppResult](<#AppResult>)
 - [type ExtractResult](<#ExtractResult>)
 - [type Recall](<#Recall>)
   - [func New\(logger \*logrus.Logger, userName string\) \(\*Recall, error\)](<#New>)
+  - [func \(r \*Recall\) ExtractApps\(\) \(\[\]AppResult, error\)](<#Recall.ExtractApps>)
   - [func \(r \*Recall\) ExtractImages\(\) \(\[\]ExtractResult, error\)](<#Recall.ExtractImages>)
   - [func \(r \*Recall\) ExtractWeb\(\) \(\[\]WebResult, error\)](<#Recall.ExtractWeb>)
   - [func \(r \*Recall\) GrabText\(\) \(\[\]TextGrab, error\)](<#Recall.GrabText>)
@@ -30,6 +33,15 @@ var (
 )
 ```
 
+<a name="GetUserName"></a>
+## func GetUserName
+
+```go
+func GetUserName() (string, error)
+```
+
+
+
 <a name="IsRecallEnabled"></a>
 ## func IsRecallEnabled
 
@@ -38,6 +50,18 @@ func IsRecallEnabled(l *logrus.Logger, username string) (bool, error)
 ```
 
 
+
+<a name="AppResult"></a>
+## type AppResult
+
+
+
+```go
+type AppResult struct {
+    Name string
+    Path string
+}
+```
 
 <a name="ExtractResult"></a>
 ## type ExtractResult
@@ -48,7 +72,8 @@ func IsRecallEnabled(l *logrus.Logger, username string) (bool, error)
 type ExtractResult struct {
     WindowTitle string
     WindowToken string
-    Timestamp   int64
+    Timestamp   time.Time
+    Screenshot  []byte
 }
 ```
 
@@ -68,6 +93,15 @@ type Recall struct {
 
 ```go
 func New(logger *logrus.Logger, userName string) (*Recall, error)
+```
+
+
+
+<a name="Recall.ExtractApps"></a>
+### func \(\*Recall\) ExtractApps
+
+```go
+func (r *Recall) ExtractApps() ([]AppResult, error)
 ```
 
 
@@ -118,7 +152,7 @@ type TextGrab struct {
 
 ```go
 type WebResult struct {
-    Timestamp int64
+    Timestamp time.Time
     Domain    string
     URL       string
 }
