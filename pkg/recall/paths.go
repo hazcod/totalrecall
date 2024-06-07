@@ -17,7 +17,7 @@ func getRecallPaths(logger *logrus.Logger, username string) (string, string, err
 		return "", "", err
 	}
 
-	logger.Debugf("📁 Recall folder found: %s\n", guidFolder)
+	logger.Debugf("recall folder found: %s\n", guidFolder)
 
 	dbPath := filepath.Join(guidFolder, "ukg.db")
 	imageStorePath := filepath.Join(guidFolder, "ImageStore")

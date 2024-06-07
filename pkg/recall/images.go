@@ -1,13 +1,12 @@
 package recall
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 	"time"
+	"zombiezen.com/go/sqlite"
 )
 
 var (
@@ -17,16 +16,7 @@ var (
 type ExtractResult struct {
 	WindowTitle string
 	WindowToken string
-	Timestamp   int64
-}
-
-func getUserName() (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", fmt.Errorf("error getting current user: %w", err)
-	}
-
-	return usr.Username, nil
+	Timestamp   time.Time
 }
 
 func findGuidFolder(basePath string) (string, error) {
@@ -50,30 +40,32 @@ func fileExists(path string) bool {
 }
 
 func (r *Recall) ExtractImages() ([]ExtractResult, error) {
-	conn, err := sql.Open("sqlite3", r.dbPath)
+	conn, err := sqlite.OpenConn(r.dbPath, sqlite.OpenReadOnly)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database connection: %w", err)
 	}
 	defer conn.Close()
 
 	query := `SELECT WindowTitle, TimeStamp, ImageToken FROM WindowCapture WHERE (WindowTitle IS NOT NULL OR ImageToken IS NOT NULL);`
-	rows, err := conn.Query(query)
+	stmt, err := conn.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("could not execute query: %w", err)
 	}
-	defer rows.Close()
 
 	var results []ExtractResult
 
-	for rows.Next() {
-		var windowTitle string
-		var timestamp int64
-		var imageToken string
-
-		err := rows.Scan(&windowTitle, &timestamp, &imageToken)
+	for {
+		hasRow, err := stmt.Step()
 		if err != nil {
-			return nil, fmt.Errorf("could not scan row: %w", err)
+			return nil, fmt.Errorf("could not execute query: %w", err)
 		}
+		if !hasRow {
+			break
+		}
+
+		windowTitle := stmt.GetText("WindowTitle")
+		timestamp := stmt.GetInt64("TimeStamp")
+		imageToken := stmt.GetText("ImageToken")
 
 		readableTimestamp := time.Unix(0, timestamp*int64(time.Millisecond)).Format("2006-01-02 15:04:05")
 		r.logger.WithField("timestamp", readableTimestamp).WithField("window", windowTitle).
@@ -87,7 +79,7 @@ func (r *Recall) ExtractImages() ([]ExtractResult, error) {
 		results = append(results, ExtractResult{
 			WindowTitle: windowTitle,
 			WindowToken: imageToken,
-			Timestamp:   timestamp,
+			Timestamp:   time.Unix(timestamp/1000, 0),
 		})
 	}
 

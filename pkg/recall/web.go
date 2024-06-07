@@ -1,46 +1,49 @@
 package recall
 
 import (
-	"database/sql"
 	"fmt"
+	"time"
+	"zombiezen.com/go/sqlite"
 )
 
 type WebResult struct {
-	Timestamp int64
+	Timestamp time.Time
 	Domain    string
 	URL       string
 }
 
 func (r *Recall) ExtractWeb() ([]WebResult, error) {
-	conn, err := sql.Open("sqlite3", r.dbPath)
+	conn, err := sqlite.OpenConn(r.dbPath, sqlite.OpenReadOnly)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database connection: %w", err)
 	}
 	defer conn.Close()
 
 	query := `SELECT Timestamp, Domain, Uri AS URL FROM Web;`
-	rows, err := conn.Query(query)
+	stmt, err := conn.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("could not execute query: %w", err)
 	}
-	defer rows.Close()
 
 	var results []WebResult
 
-	for rows.Next() {
-		var timestamp int64
-		var domain string
-		var url string
-
-		err := rows.Scan(&timestamp, &domain, &url)
+	for {
+		hasRow, err := stmt.Step()
 		if err != nil {
-			return nil, fmt.Errorf("could not scan row: %w", err)
+			return nil, fmt.Errorf("could not execute query: %w", err)
 		}
+		if !hasRow {
+			break
+		}
+
+		timestamp := stmt.GetInt64("Timestamp")
+		domain := stmt.GetText("Domain")
+		url := stmt.GetText("Uri")
 
 		r.logger.WithField("domain", domain).Debug("processing Recall web")
 
 		results = append(results, WebResult{
-			Timestamp: timestamp,
+			Timestamp: time.Unix(timestamp/1000, 0),
 			Domain:    domain,
 			URL:       url,
 		})

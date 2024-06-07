@@ -1,8 +1,8 @@
 package recall
 
 import (
-	"database/sql"
 	"fmt"
+	"zombiezen.com/go/sqlite"
 )
 
 type TextGrab struct {
@@ -11,29 +11,31 @@ type TextGrab struct {
 }
 
 func (r *Recall) GrabText() ([]TextGrab, error) {
-	conn, err := sql.Open("sqlite3", r.dbPath)
+	conn, err := sqlite.OpenConn(r.dbPath, sqlite.OpenReadOnly)
 	if err != nil {
 		return nil, fmt.Errorf("could not open database connection: %w", err)
 	}
 	defer conn.Close()
 
 	query := `SELECT c1, c2 AS ProgramName AS URL FROM WindowCaptureTextIndex_content;`
-	rows, err := conn.Query(query)
+	stmt, err := conn.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("could not execute query: %w", err)
 	}
-	defer rows.Close()
 
 	var results []TextGrab
 
-	for rows.Next() {
-		var windowName string
-		var contents string
-
-		err := rows.Scan(&windowName, &contents)
+	for {
+		hasRow, err := stmt.Step()
 		if err != nil {
-			return nil, fmt.Errorf("could not scan row: %w", err)
+			return nil, fmt.Errorf("could not execute query: %w", err)
 		}
+		if !hasRow {
+			break
+		}
+
+		windowName := stmt.GetText("c1")
+		contents := stmt.GetText("c2")
 
 		r.logger.WithField("window", windowName).Debug("processing Recall OCR text")
 

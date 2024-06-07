@@ -4,9 +4,9 @@ import (
 	"errors"
 	"flag"
 	"github.com/hazcod/totalrecall/pkg/recall"
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 	"os"
+	"time"
 )
 
 var (
@@ -30,12 +30,21 @@ func main() {
 
 	// ---
 
+	if *username == "" {
+		usr, err := recall.GetUserName()
+		if err != nil {
+			logger.WithError(err).Fatal("failed to detect current user, please hardcode with -username")
+		}
+		username = &usr
+	}
+
 	hasRecall, err := recall.IsRecallEnabled(nil, *username)
 	if err != nil {
 		logger.WithError(err).Error("could not determine if Recall is enabled")
 	}
+
 	if !hasRecall {
-		logger.Fatalf("%s does not have recall enabled.", *username)
+		logger.Fatalf("user %s does not have recall enabled.", *username)
 	}
 
 	recallPkg, err := recall.New(logger, *username) // current user
@@ -54,7 +63,7 @@ func main() {
 	}
 
 	for i, extract := range extracts {
-		logger.Info("%d - %s - %s - %s", i+1, extract.Timestamp, extract.WindowTitle, extract.WindowToken)
+		logger.Infof("%d - %s - %s - %s", i+1, extract.Timestamp.Format(time.DateTime), extract.WindowTitle, extract.WindowToken)
 	}
 
 	logger.WithField("total", len(extracts)).Info("extracted all Recall images")
