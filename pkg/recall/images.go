@@ -17,6 +17,7 @@ type ExtractResult struct {
 	WindowTitle string
 	WindowToken string
 	Timestamp   time.Time
+	Screenshot  []byte
 }
 
 func findGuidFolder(basePath string) (string, error) {
@@ -71,14 +72,27 @@ func (r *Recall) ExtractImages() ([]ExtractResult, error) {
 		r.logger.WithField("timestamp", readableTimestamp).WithField("window", windowTitle).
 			Debug("processing Recall image")
 
+		var imageBytes []byte
+
 		if imageToken == "" {
 			r.logger.WithField("timestamp", readableTimestamp).WithField("window", windowTitle).
-				Warn("image token is empty")
+				Debug("image token is empty")
+		} else {
+			screenshotPath := filepath.Join(r.imagePath, imageToken)
+
+			imageBytes, err = os.ReadFile(screenshotPath)
+			if err != nil {
+				r.logger.WithError(err).WithField("path", screenshotPath).Fatal("could not load image")
+			}
+
+			r.logger.WithField("size", len(imageBytes)).WithField("program", windowTitle).
+				Debug("loaded screenshot")
 		}
 
 		results = append(results, ExtractResult{
 			WindowTitle: windowTitle,
 			WindowToken: imageToken,
+			Screenshot:  imageBytes,
 			Timestamp:   time.Unix(timestamp/1000, 0),
 		})
 	}
